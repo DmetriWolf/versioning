@@ -71,7 +71,7 @@ You are advised to be careful about what order you define the mixins for your ve
 
 While it's useful to feed results into mixins, you're advised to be caucious. Something like mixin(version("NOTvvv","OR","mmm")); is legal, but in order for it to work you must have a mixin(version("NOT","vvv")); mixin BEFORE it. It'll all probably work out if you know what you're doing but I'm not making any guarentees as I haven't tested the module extensively.
 
-####Urinary Operators
+####Unary  Operators
 
 ##### NOT
 
@@ -171,7 +171,7 @@ enum Grammar : string {
 ```
 If you'd like to provide grammar on a per mixin basis, you need to provide additional strings to the specific Version or Debug calls:
 ```D
-//Urinary
+//Unary 
 mixin(VersionNOT("ver","prefix_","_suffix"));
 
 version(prefix_ver_suffix)
