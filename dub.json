@@ -4,7 +4,7 @@
 	"authors": ["Dmetri Wolf"],
 	"copyright": "Copyright© 2015, Dmetri Wolf",
 	"homepage": "https://github.com/DmetriWolf/Versioning",
-	"licence": "Boost 1.0",
+	"license": "BSL-1.0",
 	"targetType": "library",	
 	"version": "1.0.0"  
 }
