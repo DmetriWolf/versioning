@@ -19,7 +19,7 @@ If you're using dub, it can do this for you if you add versioning to your depend
 {	
 	...
 	"dependencies": {
-		"versioning": "~>1.0.0"
+		"versioning": "~>0.1.1" 
 	}
 }
 ```
