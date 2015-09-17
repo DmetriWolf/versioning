@@ -13,10 +13,10 @@ void main(){
 Download the file and add the source to your compiler's import paths.
 If you're using dub, it can do this for you if you add versioning to your dependencies in your dub.json file.
 ```JSON
-{
-	"name": "myproject",
+{	
+	...
 	"dependencies": {
-	  "versioning":    ">=1.0.0"
+		"versioning": "~>1.0.0"
 	}
 }
 ```
