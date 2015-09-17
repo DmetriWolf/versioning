@@ -12,7 +12,7 @@ void main(){
 ####Step 1 
 Download the file and add the source to your compiler's import paths.
 If you're using dub, it can do this for you if you add versioning to your dependencies in your dub.json file.
-```JSON
+```
 {	
 	...
 	"dependencies": {
