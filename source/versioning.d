@@ -150,14 +150,15 @@ enum Grammar : string {
 	KeyUmbrella = "u",
 	KeyBase = "b"
 }
+
+//Version section
+string Version( string[] arguments... ){
 // Easy function to call each of the others with readable syntax:
 // mixin(Version("dog","OR","cat"));
 // ManyAND works with // mixin(Version("AND","ANDermals","dog","cat","mouse")); // ANDermals
 // Umberella are called with "u" and "b respectively
 // Just be careful that you use the right grammar
 // You can't use on the fly grammar or write in suffixes etc
-
-string Version( string[] arguments... ){
 	if( arguments[0] == Grammar.PrefixNOT ){
 		return VersionNOT(arguments[1]);
 	} else if( arguments[1] == Grammar.SeparatorOR ){
@@ -175,6 +176,7 @@ string Version( string[] arguments... ){
 	}
 	assert(0, "Versioning Version(string...) was use incorrectly.");
 }
+
 string VersionUmbrella( string umbrella_term, string[] subsidiaries... ){
 	return Umbrella( "version", umbrella_term, subsidiaries );
 }
@@ -199,8 +201,7 @@ string VersionXOR( string version1, string version2, string separator = "",
 string VersionNOT( string version1, string prefix = "", string suffix = "" ){
 	return NOT( "version", version1, prefix, suffix );
 }
-
-
+//Debug section
 string Debug( string[] arguments... ){
 	if( arguments[0] == Grammar.PrefixNOT ){
 		return DebugNOT(arguments[1]);
@@ -232,3 +233,177 @@ string DebugOR( string version1, string version2, string separator = "",
   string prefix = "", string suffix = "" ){
 	return OR( "debug", version1, version2, separator, prefix, suffix );
 }
+string DebugAND( string version1, string version2, string separator = "", 
+  string prefix = "", string suffix = "" ){
+	return AND( "debug", version1, version2, separator, prefix, suffix );
+}
+string DebugXOR( string version1, string version2, string separator = "", 
+  string prefix = "", string suffix = "" ){
+	return XOR( "debug", version1, version2, separator, prefix, suffix );
+}
+string DebugNOT( string version1, string prefix = "NOT", string suffix = "" ){
+	return NOT( "debug", version1, prefix, suffix );
+}
+/* String constructors for each type of operation, independant of keyword used. */
+private:
+string Umbrella( string term, string umbrella_term,
+  string[] subsidiaries...){
+	string all = format( "%s(%s){\n", term, umbrella_term );
+	foreach( sub; subsidiaries ){
+		all = format( "%s%s = %s;\n", all, term, sub );
+	}
+	all = format( "%s}", all );
+	return all;
+}
+string Base( string term, string base_term,
+  string[] derivatives...){
+	string all;
+	foreach( sub; derivatives ){
+		all = format( "%s%s(%s) %s = %s;\n", all, term, sub, term, base_term );
+	}
+	return all;
+}
+string OR( string term, string version1, string version2, 
+  string separator = "", string prefix = "", string suffix = "" ){
+  	string s = separator;
+  	if( separator == "" ){
+		s = Grammar.SeparatorOR;
+	}
+	string p = prefix;
+	if( prefix == "" ){
+		p = Grammar.PrefixOR;
+		if( p == "" ){
+			p = Grammar.Prefix;
+		}
+	}
+	string su = suffix;
+	if( suffix == "" ){
+		su = Grammar.SuffixOR;
+		if( su == "" ){
+			su= Grammar.Suffix;
+		}
+	}
+	return format( "%s(%s) %s = %s%s%s%s%s;\n%s(%s) %s = %s%s%s%s%s;
+%s(%s) %s = %s%s%s%s%s;\n%s(%s) %s = %s%s%s%s%s;", 
+	  term, version1, term, p, version1, s, version2, su, term, version2, term, 
+	  p, version1, s, version2, su, term, version1, term, p, version2, s, 
+	  version1, su, term, version2, term, p, version2, s, version1, su );
+}
+string AND( string term, string version1, string version2, 
+  string separator = "", string prefix = "", string suffix = "" ){
+	string s = separator;
+  	if( separator == "" ){
+		s = Grammar.SeparatorAND;
+	}
+	string p = prefix;
+	if( prefix == "" ){
+		p = Grammar.PrefixAND;
+		if( p == "" ){
+			p = Grammar.Prefix;
+		}
+	}
+	string su = suffix;
+	if( suffix == "" ){
+		su = Grammar.SuffixAND;
+		if( su == "" ){
+			su= Grammar.Suffix;
+		}
+	}
+	return format( "%s(%s)%s(%s) %s = %s%s%s%s%s;\n%s(%s)%s(%s) %s = %s%s%s%s%s;", term, version1, 
+	 term, version2, term, p, version1,
+	  s, version2, su, term, version1, term, version2, term, p, version2, 
+	  s, version1, su );
+}
+string ManyAND( string term, string name, string[] versions... ){
+	string s;
+	import std.stdio;
+	foreach( vers; versions[] ){
+		s = format( "%s%s(%s)", s, term, vers );
+	}
+	s = format( "%s %s = %s;", s, term, name );
+	return s;
+}
+string XOR( string term, string version1, string version2, 
+  string separator = "", string prefix = "", string suffix = "" ){
+  	string s = separator;
+  	if( separator == "" ){
+		s = Grammar.SeparatorXOR;
+	}
+	string p = prefix;
+	if( prefix == "" ){
+		p = Grammar.PrefixXOR;
+		if( p == "" ){
+			p = Grammar.Prefix;
+		}
+	}
+	string su = suffix;
+	if( suffix == "" ){
+		su = Grammar.SuffixXOR;
+		if( su == "" ){
+			su= Grammar.Suffix;
+		}
+	}
+
+	return format( "%s(%s){\n%s(%s){\n} else {\n%s = %s%s%s%s%s;\n%s = %s%s%s%s%s;\n}
+} else {\n%s(%s){\n%s = %s%s%s%s%s;\n%s = %s%s%s%s%s;\n}\n}", 
+	  term, version1, term, version2, term, p, version1, s, version2, su, term, p, version2, s, version1, su,
+	  term, version2, term, p, version1, s, version2, su, term, p, version2, s, version1, su );
+}
+string NOT( string term, string version1, string prefix = "", string suffix = "" ){
+	string p = prefix;
+	if( prefix == "" ){
+		p = Grammar.PrefixXOR;
+		if( p == "" ){
+			p = Grammar.Prefix;
+		}
+	}
+	string su = suffix;
+	if( suffix == "" ){
+		su = Grammar.SuffixXOR;
+		if( su == "" ){
+			su= Grammar.Suffix;
+		}
+	}
+	return format( "%s(%s){\n}else{\n%s = %s%s%s; \n}\n", term, version1, term,
+	  p, version1, su );
+}
+
+unittest {
+	import std.stdio;
+	// mixin(OR( "debug", "ver1", "ver2", "_or_" )); //Error at this scope
+
+	// As these outputs need to be printed at module level they can't be
+	// tested as code in a unittest, but they can be printed to the screen.
+	writeln( "OR Test: \n", OR( "version", "ver1", "ver2", "_or_" ) );
+	writeln( "AND Test: \n", AND( "debug", "ver1", "ver2", "_and_" ) );
+	writeln( "XOR Test: \n", XOR( "version", "ver1", "ver2", "_xor_" ) );
+	writeln( "NOT Test: \n", NOT( "debug", "name", "not_", "_not" ) );
+
+	writeln( "Umbrealla Test: \n", Umbrella( "debug", "abc", "a", "b", "c", "d" ) );
+	writeln( "Base Test: \n", Base( "debug", "food", "cheese", "potato" ) );
+
+	writeln( "Debug Test: umbrella \n", Debug( "u", "weather", "rain", "hail", "snow" ) );
+	writeln( "Version Test: base\n", Version( "b", "weather", "rain", "hail", "snow" ) );
+	writeln( "Version Test: manyand\n", Version( "AND", "weather", "rain", "hail", "snow" ) );
+	writeln( "Debug Test: not \n", Debug( "NOT", "weather" ) );
+	writeln( "Version Test: xor\n", Version( "friend", "XOR", "enemy" ) );
+	writeln( "Version Test: or\n", Version( "friend", "OR", "enemy" ) );
+	writeln( "Version Test: and\n", Version( "friend", "AND", "enemy" ) );
+}
+/* Test code if unittests worked:
+
+	mixin(DebugOR( "ver1", "ver2", "_or_" ) );
+	mixin(VersionAND( "ver1", "ver2", "_and_" ) );
+	mixin(VersionXOR( "ver1", "ver2", "_xor_" ) );
+	mixin(DebugNOT( "name", "not_", "_not" ) );
+	mixin(DebugUmbrella( "abc", "a", "b", "c", "d" ) );
+	mixin(VersionBase( "food", "cheese", "potato" ) );
+	mixin(Debug( "u", "weather", "rain", "hail", "snow" ) );
+	mixin(Version( "b", "weather", "rain", "hail", "snow" ) );
+	mixin(Version( "AND", "weather", "rain", "hail", "snow" ) );
+	mixin(Debug( "NOT", "weather" ) );
+	mixin(Version( "friend", "XOR", "enemy" ) );
+	mixin(Version( "friend", "OR", "enemy" ) );
+	mixin(Version( "friend", "AND", "enemy" ) );
+
+*/
