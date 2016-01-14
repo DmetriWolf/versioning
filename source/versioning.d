@@ -71,7 +71,7 @@ module versioning;
  * which order you defined them as. 
  *
  * -- !!! ORDER OF USE !!! --------------------------------------------------+
- * It is recommended that you use Umbrella before using the other finctons   |
+ * It is recommended that you use Umbrella before using the other functions  |
  * as Umbrella may need to switch on versions to be used by those functions. |
  * If you are feeding(see above), then you need to determine those BEFORE    |
  * you feed them in.                                                         |
